@@ -1,0 +1,33 @@
+<?php
+
+namespace MobileCart\FedexBundle\Api\RateV10\SimpleType;
+
+/**
+ *
+ *
+ */
+class CustomerReferenceType extends SimpleTypeAbstract
+{
+    const BILL_OF_LADING = 'BILL_OF_LADING';
+
+    const CUSTOMER_REFERENCE = 'CUSTOMER_REFERENCE';
+
+    const DEPARTMENT_NUMBER = 'DEPARTMENT_NUMBER';
+
+    const ELECTRONIC_PRODUCT_CODE = 'ELECTRONIC_PRODUCT_CODE';
+
+    const INTRACOUNTRY_REGULATORY_REFERENCE = 'INTRACOUNTRY_REGULATORY_REFERENCE';
+
+    const INVOICE_NUMBER = 'INVOICE_NUMBER';
+
+    const PACKING_SLIP_NUMBER = 'PACKING_SLIP_NUMBER';
+
+    const P_O_NUMBER = 'P_O_NUMBER';
+
+    const SHIPMENT_INTEGRITY = 'SHIPMENT_INTEGRITY';
+
+    const STORE_NUMBER = 'STORE_NUMBER';
+
+
+}
+

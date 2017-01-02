@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="fedex.api_key"> </parameter>
+        <parameter key="fedex.api_password"> </parameter>
+        <parameter key="fedex.account_number"> </parameter>
+        <parameter key="fedex.meter_number"> </parameter>
+        <parameter key="fedex.src.street"> </parameter>
+        <parameter key="fedex.src.city"> </parameter>
+        <parameter key="fedex.src.province"> </parameter>
+        <parameter key="fedex.src.postcode"> </parameter>
+        <parameter key="fedex.src.country"> </parameter>
+        <parameter key="fedex.methods.csv"> </parameter><!-- optional: whitelist the methods -->
+        <parameter key="fedex.weight_unit">LB</parameter>
+        <parameter key="fedex.rate.v10.class">MobileCart\FedexBundle\Service\RateV10Service</parameter>
+        <parameter key="cart.listener.shipping_rate.fedex.v10.class">MobileCart\FedexBundle\EventListener\Shipping\RatesV10</parameter>
+    </parameters>
+
+    <services>
+        <service id="fedex.rate.v10" lazy="true" class="%fedex.rate.v10.class%">
+            <call method="setApiKey">
+                <argument type="string">%fedex.api_key%</argument>
+            </call>
+            <call method="setApiPassword">
+                <argument type="string">%fedex.api_password%</argument>
+            </call>
+            <call method="setAccountNbr">
+                <argument type="string">%fedex.account_number%</argument>
+            </call>
+            <call method="setMeterNbr">
+                <argument type="string">%fedex.meter_number%</argument>
+            </call>
+            <call method="setWeightUnit">
+                <argument type="string">%fedex.weight_unit%</argument>
+            </call>
+            <call method="setSrcStreet">
+                <argument type="string">%fedex.src.street%</argument>
+            </call>
+            <call method="setSrcCity">
+                <argument type="string">%fedex.src.city%</argument>
+            </call>
+            <call method="setSrcProvince">
+                <argument type="string">%fedex.src.province%</argument>
+            </call>
+            <call method="setSrcPostcode">
+                <argument type="string">%fedex.src.postcode%</argument>
+            </call>
+            <call method="setSrcCountry">
+                <argument type="string">%fedex.src.country%</argument>
+            </call>
+            <call method="setMethodsCsv">
+                <argument type="string">%fedex.methods.csv%</argument>
+            </call>
+        </service>
+
+        <service id="cart.listener.shipping_rate.fedex.v10" lazy="true" class="%cart.listener.shipping_rate.fedex.v10.class%">
+            <tag name="kernel.event_listener" event="shipping_rate.collect" method="onShippingRateCollect" priority="50" />
+            <call method="setShippingService">
+                <argument type="service" id="fedex.rate.v10" />
+            </call>
+        </service>
+    </services>
+
+</container>

@@ -1,0 +1,34 @@
+<?php
+
+namespace MobileCart\FedexBundle\Api\RateV10\SimpleType;
+
+/**
+ * Names for data elements / areas which may be suppressed from printing on labels. 
+ *
+ *
+ */
+class LabelMaskableDataType extends SimpleTypeAbstract
+{
+    const CUSTOMS_VALUE = 'CUSTOMS_VALUE';
+
+    const DIMENSIONS = 'DIMENSIONS';
+
+    const DUTIES_AND_TAXES_PAYOR_ACCOUNT_NUMBER = 'DUTIES_AND_TAXES_PAYOR_ACCOUNT_NUMBER';
+
+    const FREIGHT_PAYOR_ACCOUNT_NUMBER = 'FREIGHT_PAYOR_ACCOUNT_NUMBER';
+
+    const PACKAGE_SEQUENCE_AND_COUNT = 'PACKAGE_SEQUENCE_AND_COUNT';
+
+    const SHIPPER_ACCOUNT_NUMBER = 'SHIPPER_ACCOUNT_NUMBER';
+
+    const SUPPLEMENTAL_LABEL_DOC_TAB = 'SUPPLEMENTAL_LABEL_DOC_TAB';
+
+    const TERMS_AND_CONDITIONS = 'TERMS_AND_CONDITIONS';
+
+    const TOTAL_WEIGHT = 'TOTAL_WEIGHT';
+
+    const TRANSPORTATION_CHARGES_PAYOR_ACCOUNT_NUMBER = 'TRANSPORTATION_CHARGES_PAYOR_ACCOUNT_NUMBER';
+
+
+}
+

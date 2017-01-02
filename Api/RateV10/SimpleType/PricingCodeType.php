@@ -1,0 +1,39 @@
+<?php
+
+namespace MobileCart\FedexBundle\Api\RateV10\SimpleType;
+
+/**
+ *
+ *
+ */
+class PricingCodeType extends SimpleTypeAbstract
+{
+    const ACTUAL = 'ACTUAL';
+
+    const ALTERNATE = 'ALTERNATE';
+
+    const BASE = 'BASE';
+
+    const HUNDREDWEIGHT = 'HUNDREDWEIGHT';
+
+    const HUNDREDWEIGHT_ALTERNATE = 'HUNDREDWEIGHT_ALTERNATE';
+
+    const INTERNATIONAL_DISTRIBUTION = 'INTERNATIONAL_DISTRIBUTION';
+
+    const INTERNATIONAL_ECONOMY_SERVICE = 'INTERNATIONAL_ECONOMY_SERVICE';
+
+    const LTL_FREIGHT = 'LTL_FREIGHT';
+
+    const PACKAGE = 'PACKAGE';
+
+    const SHIPMENT = 'SHIPMENT';
+
+    const SHIPMENT_FIVE_POUND_OPTIONAL = 'SHIPMENT_FIVE_POUND_OPTIONAL';
+
+    const SHIPMENT_OPTIONAL = 'SHIPMENT_OPTIONAL';
+
+    const SPECIAL = 'SPECIAL';
+
+
+}
+
