@@ -55,6 +55,8 @@ class RateV10Service
 
     protected $weight_unit = 'LB';
 
+    protected $measure_unit = 'IN'; // IN or CM
+
     protected $dropoff_type = 'REGULAR_PICKUP';
 
     //protected $service_type = 'FEDEX_GROUND';
@@ -231,6 +233,21 @@ class RateV10Service
         return $this->weight_unit;
     }
 
+    public function setMeasureUnit($measureUnit)
+    {
+        if (!in_array($measureUnit, ['IN','CM'])) {
+            throw new \InvalidArgumentException("Measure Unit must be IN or CM");
+        }
+
+        $this->measure_unit = $measureUnit;
+        return $this;
+    }
+
+    public function getMeasureUnit()
+    {
+        return $this->measure_unit;
+    }
+
     public function setDropoffType($dropoffType)
     {
         $this->dropoff_type = $dropoffType;
@@ -375,34 +392,69 @@ class RateV10Service
         $shipment->setPackagingType($packageType);
         $shipment->setPackageCount($this->getPackageCount());
 
-        // Weight
-        $weight = new Weight();
-        $weightUnits = new WeightUnits($this->getWeightUnit());
-        $weight->setUnits($weightUnits);
-        $weight->setValue($this->getWeight());
-
         // Package Line items
         $packages = [];
 
-        // foreach($this->cartItems as $item) {
+        if ($this->getCartItems()) {
+            foreach($this->getCartItems() as $cartItem) {
+                if ($cartItem->getHeight() > 0
+                    && $cartItem->getWidth() > 0
+                    && $cartItem->getLength() > 0
+                    && $cartItem->getWeight() > 0
+                ) {
+
+                    // Weight
+                    $weight = new Weight();
+                    $weightUnits = new WeightUnits($this->getWeightUnit());
+                    $weight->setUnits($weightUnits);
+                    $weight->setValue($cartItem->getWeight());
+
+                    $package = new RequestedPackageLineItem();
+                    $dimensions = new Dimensions();
+                    $dimensions->setUnits(new LinearUnits($this->getMeasureUnit()))
+                        ->setHeight($cartItem->getHeight())
+                        ->setWidth($cartItem->getWidth())
+                        ->setLength($cartItem->getLength());
+
+                    $package->setWeight($weight)
+                        ->setDimensions($dimensions)
+                        ->setGroupPackageCount($cartItem->getQty());
+
+                    $packages[] = $package;
+                }
+            }
+        }
+
+        if (!$packages) {
+
+            // Weight
+            $weight = new Weight();
+            $weightUnits = new WeightUnits($this->getWeightUnit());
+            $weight->setUnits($weightUnits);
+            $weight->setValue($this->getWeight());
 
             $package = new RequestedPackageLineItem();
             $dimensions = new Dimensions();
-            $dimensions->setUnits(new LinearUnits('IN')) // todo
-                ->setHeight(6) // todo
-                ->setWidth(6) // todo
-                ->setLength(6); // todo
+            $dimensions->setUnits(new LinearUnits($this->getMeasureUnit()))
+                ->setHeight(6)
+                ->setWidth(6)
+                ->setLength(6);
 
             $package->setWeight($weight)
                 ->setDimensions($dimensions)
-                ->setGroupPackageCount(1) // todo
-            ;
+                ->setGroupPackageCount(1);
 
             $packages[] = $package;
-        // }
+        }
 
         $shipment->setRequestedPackageLineItems($packages);
-        $shipment->setTotalWeight($weight);
+
+        // Weight
+        $totalWeight = new Weight();
+        $totalWeight->setUnits(new WeightUnits($this->getWeightUnit()));
+        $totalWeight->setValue($this->getWeight());
+
+        $shipment->setTotalWeight($totalWeight);
 
         $request->setRequestedShipment($shipment);
         $this->setRequest($request);
