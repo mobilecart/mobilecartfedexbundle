@@ -114,10 +114,16 @@ class RatesV10 extends Rate
         $svc->setDestAddress($destination);
         $methods = $svc->getRates();
 
+        $rates = [];
+
         if ($methods) {
             foreach($methods as $method) {
                 $rate = new Rate();
                 $rate->addData($method->getData());
+                $rates[$rate->getPrice()] = $rate;
+            }
+            ksort($rates);
+            foreach($rates as $rate) {
                 $event->addRate($rate);
             }
         }
