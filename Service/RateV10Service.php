@@ -517,7 +517,10 @@ class RateV10Service
                 }
 
                 $nameParts = explode('_', $serviceType);
-                unset($nameParts[0]); // remove 'FEDEX'
+                if ($nameParts[0] == 'FEDEX') {
+                    unset($nameParts[0]); // remove 'FEDEX'
+                }
+
                 foreach($nameParts as $k => $v) {
                     $nameParts[$k] = ucfirst(strtolower($v));
                 }
