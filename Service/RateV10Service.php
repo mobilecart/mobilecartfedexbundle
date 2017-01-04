@@ -418,7 +418,7 @@ class RateV10Service
 
                     $package->setWeight($weight)
                         ->setDimensions($dimensions)
-                        ->setGroupPackageCount($cartItem->getQty());
+                        ->setGroupPackageCount(1);
 
                     $packages[] = $package;
                 }
