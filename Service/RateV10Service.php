@@ -387,16 +387,18 @@ class RateV10Service
         $dropoff = new DropoffType($this->getDropoffType());
         $shipment->setDropoffType($dropoff);
 
+        $packageCount = count($this->getCartItems());
+
         // Package
         $packageType = new PackagingType($this->getPackageType());
         $shipment->setPackagingType($packageType);
-        $shipment->setPackageCount($this->getPackageCount());
+        $shipment->setPackageCount($packageCount);
 
         // Package Line items
         $packages = [];
 
         if ($this->getCartItems()) {
-            $count = count($this->getCartItems());
+
             foreach($this->getCartItems() as $cartItem) {
                 if ($cartItem->getHeight() > 0
                     && $cartItem->getWidth() > 0
@@ -419,7 +421,7 @@ class RateV10Service
 
                     $package->setWeight($weight)
                         ->setDimensions($dimensions)
-                        ->setGroupPackageCount($count);
+                        ->setGroupPackageCount(1);
 
                     $packages[] = $package;
                 }
