@@ -396,6 +396,7 @@ class RateV10Service
         $packages = [];
 
         if ($this->getCartItems()) {
+            $count = count($this->getCartItems());
             foreach($this->getCartItems() as $cartItem) {
                 if ($cartItem->getHeight() > 0
                     && $cartItem->getWidth() > 0
@@ -418,7 +419,7 @@ class RateV10Service
 
                     $package->setWeight($weight)
                         ->setDimensions($dimensions)
-                        ->setGroupPackageCount(1);
+                        ->setGroupPackageCount($count);
 
                     $packages[] = $package;
                 }
