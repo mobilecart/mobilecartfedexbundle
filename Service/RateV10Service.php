@@ -35,17 +35,9 @@ class RateV10Service
 
     protected $meter_nbr;
 
-    protected $src_street = []; // explode string with pipe | character
+    protected $src_address; // ArrayWrapper
 
-    protected $src_city = '';
-
-    protected $src_postcode = '';
-
-    protected $src_province = '';
-
-    protected $src_country = '';
-
-    protected $dest_address;
+    protected $dest_address; // ArrayWrapper
 
     protected $package_type = 'YOUR_PACKAGING';
 
@@ -117,59 +109,15 @@ class RateV10Service
         return $this->meter_nbr;
     }
 
-    public function setSrcStreet($srcStreet)
+    public function setSrcAddress($srcAddress)
     {
-        $this->src_street = explode('|', $srcStreet);
+        $this->src_address = $srcAddress; // object
         return $this;
     }
 
-    public function getSrcStreet()
+    public function getSrcAddress()
     {
-        return $this->src_street;
-    }
-
-    public function setSrcCity($srcCity)
-    {
-        $this->src_city = $srcCity;
-        return $this;
-    }
-
-    public function getSrcCity()
-    {
-        return $this->src_city;
-    }
-
-    public function setSrcPostcode($srcPostcode)
-    {
-        $this->src_postcode = $srcPostcode;
-        return $this;
-    }
-
-    public function getSrcPostcode()
-    {
-        return $this->src_postcode;
-    }
-
-    public function setSrcProvince($srcProvince)
-    {
-        $this->src_province = $srcProvince;
-        return $this;
-    }
-
-    public function getSrcProvince()
-    {
-        return $this->src_province;
-    }
-
-    public function setSrcCountry($srcCountry)
-    {
-        $this->src_country = $srcCountry;
-        return $this;
-    }
-
-    public function getSrcCountry()
-    {
-        return $this->src_country;
+        return $this->src_address;
     }
 
     public function setDestAddress($destAddress)
@@ -350,26 +298,26 @@ class RateV10Service
         // already has defaults set
         $request->setVersion($version);
 
-        // Specify Shipment
-        $shipment = new RequestedShipment();
-
         // Origin Address
         $origin = new ContactAndAddress();
         $originAddress = new Address();
         $originAddress
-            ->setStreetLines($this->getSrcStreet())
-            ->setCity($this->getSrcCity())
-            ->setPostalCode($this->getSrcPostcode())
-            ->setCountryCode($this->getSrcCountry())
-            ->setStateOrProvinceCode($this->getSrcProvince())
+            ->setStreetLines(explode('|', $this->getSrcAddress()->getStreet()))
+            ->setCity($this->getSrcAddress()->getCity())
+            ->setPostalCode($this->getSrcAddress()->getPostcode())
+            ->setCountryCode($this->getSrcAddress()->getCountry())
+            ->setStateOrProvinceCode($this->getSrcAddress()->getProvince())
         ;
 
         $origin->setAddress($originAddress);
 
+        // Specify Shipment
+        $shipment = new RequestedShipment();
         $shipment->setOrigin($origin);
 
         // Destination Address
         $dest = new Party();
+
         $destAddress = new Address();
         $destination = $this->getDestAddress();
         $destAddress

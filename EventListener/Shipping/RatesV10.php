@@ -112,10 +112,19 @@ class RatesV10 extends Rate
         ]);
 
         $svc->setDestAddress($destination);
+
+        $source = new ArrayWrapper([
+            'street' => '',
+            'city' => '',
+            'province' => $rateRequest->getSrcRegion(),
+            'postcode' => $rateRequest->getSrcPostcode(),
+            'country' => $rateRequest->getSrcCountryId(),
+        ]);
+
+        $svc->setSrcAddress($source);
         $methods = $svc->getRates();
 
         $rates = [];
-
         if ($methods) {
             foreach($methods as $method) {
                 $rate = new Rate();

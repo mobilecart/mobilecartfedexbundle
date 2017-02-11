@@ -9,11 +9,6 @@
         <parameter key="fedex.api_password"> </parameter>
         <parameter key="fedex.account_number"> </parameter>
         <parameter key="fedex.meter_number"> </parameter>
-        <parameter key="fedex.src.street"> </parameter>
-        <parameter key="fedex.src.city"> </parameter>
-        <parameter key="fedex.src.province"> </parameter>
-        <parameter key="fedex.src.postcode"> </parameter>
-        <parameter key="fedex.src.country"> </parameter>
         <parameter key="fedex.methods.csv"> </parameter><!-- optional: whitelist the methods -->
         <parameter key="fedex.weight_unit">LB</parameter>
         <parameter key="fedex.rate.v10.class">MobileCart\FedexBundle\Service\RateV10Service</parameter>
@@ -36,21 +31,6 @@
             </call>
             <call method="setWeightUnit">
                 <argument type="string">%fedex.weight_unit%</argument>
-            </call>
-            <call method="setSrcStreet">
-                <argument type="string">%fedex.src.street%</argument>
-            </call>
-            <call method="setSrcCity">
-                <argument type="string">%fedex.src.city%</argument>
-            </call>
-            <call method="setSrcProvince">
-                <argument type="string">%fedex.src.province%</argument>
-            </call>
-            <call method="setSrcPostcode">
-                <argument type="string">%fedex.src.postcode%</argument>
-            </call>
-            <call method="setSrcCountry">
-                <argument type="string">%fedex.src.country%</argument>
             </call>
             <call method="setMethodsCsv">
                 <argument type="string">%fedex.methods.csv%</argument>
