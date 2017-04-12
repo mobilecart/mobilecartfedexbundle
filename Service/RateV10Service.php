@@ -415,7 +415,11 @@ class RateV10Service
     public function sendRateRequest()
     {
         $clientClass = 'MobileCart\FedexBundle\Api\RateV10\SoapClient';
-        $options = [];
+        $options = [
+            'exceptions' => 0,
+            'keep_alive' => false,
+            'connection_timeout' => 500000,
+        ];
         $wsdl = realpath(__DIR__ . '/../Api/RateV10/fedex_v10.wsdl');
         $svc = new SoapService($clientClass, $wsdl, $options);
         $this->setResponse($svc->getRates($this->getRequest()));
