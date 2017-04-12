@@ -416,13 +416,19 @@ class RateV10Service
     {
         $clientClass = 'MobileCart\FedexBundle\Api\RateV10\SoapClient';
         $options = [
-            'exceptions' => 0,
+            'exceptions' => 1,
             'keep_alive' => false,
             'connection_timeout' => 500000,
         ];
         $wsdl = realpath(__DIR__ . '/../Api/RateV10/fedex_v10.wsdl');
         $svc = new SoapService($clientClass, $wsdl, $options);
-        $this->setResponse($svc->getRates($this->getRequest()));
+
+        try {
+            $this->setResponse($svc->getRates($this->getRequest()));
+        } catch(\Exception $e) {
+            // no-op
+        }
+
         return $this;
     }
 
