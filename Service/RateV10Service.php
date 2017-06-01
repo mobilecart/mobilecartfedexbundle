@@ -65,6 +65,11 @@ class RateV10Service
 
     protected $cartItems = [];
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
     public function setApiKey($apiKey)
     {
         $this->api_key = $apiKey;
@@ -272,6 +277,24 @@ class RateV10Service
         return $this->cartItems;
     }
 
+    /**
+     * @param $logger
+     * @return $this
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
     public function buildRateRequest()
     {
         $request = new RateRequest();
@@ -420,13 +443,22 @@ class RateV10Service
             'keep_alive' => false,
             'connection_timeout' => 500000,
         ];
+
         $wsdl = realpath(__DIR__ . '/../Api/RateV10/fedex_v10.wsdl');
         $svc = new SoapService($clientClass, $wsdl, $options);
 
-        try {
-            $this->setResponse($svc->getRates($this->getRequest()));
-        } catch(\Exception $e) {
-            // no-op
+        $success = false;
+        for ($x = 0; $x <= 3; $x++) {
+            try {
+                $this->setResponse($svc->getRates($this->getRequest()));
+                $success = true;
+            } catch(\Exception $e) {
+                $this->getLogger()->error("FedEx Error :" . $e->getMessage());
+            }
+
+            if ($success) {
+                break;
+            }
         }
 
         return $this;

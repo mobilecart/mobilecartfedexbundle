@@ -35,6 +35,9 @@
             <call method="setMethodsCsv">
                 <argument type="string">%fedex.methods.csv%</argument>
             </call>
+            <call method="setLogger">
+                <argument type="service" id="logger" />
+            </call>
         </service>
 
         <service id="cart.listener.shipping_rate.fedex.v10" lazy="true" class="%cart.listener.shipping_rate.fedex.v10.class%">
