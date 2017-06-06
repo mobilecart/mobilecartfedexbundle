@@ -147,7 +147,7 @@ class RatesV10 extends Rate
         $svc->setSrcAddress($source);
 
         $this->getLogger()->info("FedEx Source : " . print_r($source, 1));
-        $this->getLogger()->info("FedEx Destination : " . print_r($source, 1));
+        $this->getLogger()->info("FedEx Destination : " . print_r($destination, 1));
 
         $methods = $svc->getRates();
 
