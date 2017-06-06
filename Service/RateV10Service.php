@@ -497,6 +497,9 @@ class RateV10Service
             && $response->getHighestSeverity() == 'SUCCESS'
             && $response->getRateReplyDetails()
         ) {
+
+            $this->getLogger()->info("FedEx Response Success");
+
             // parse out rates into ArrayWrapper objects
             foreach($response->getRateReplyDetails() as $rate) {
 
@@ -506,6 +509,7 @@ class RateV10Service
                 if ($this->getMethods()
                     && !in_array($serviceType, $this->getMethods())
                 ) {
+                    $this->getLogger()->info("FedEx Response . Skipping method: {$serviceType}");
                     continue;
                 }
 
@@ -552,6 +556,8 @@ class RateV10Service
                     'code' => "FedEx {$method}",
                 ]);
             }
+        } else {
+            $this->getLogger()->alert("FedEx Error . No rates . " . print_r($response, 1));
         }
 
         return $this->rates;

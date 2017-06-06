@@ -24,6 +24,11 @@ class RatesV10 extends Rate
 
     protected $event;
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
     protected function setEvent($event)
     {
         $this->event = $event;
@@ -69,6 +74,24 @@ class RatesV10 extends Rate
     public function getShippingService()
     {
         return $this->shippingService;
+    }
+
+    /**
+     * @param $logger
+     * @return $this
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**
@@ -122,7 +145,13 @@ class RatesV10 extends Rate
         ]);
 
         $svc->setSrcAddress($source);
+
+        $this->getLogger()->info("FedEx Source : " . print_r($source, 1));
+        $this->getLogger()->info("FedEx Destination : " . print_r($source, 1));
+
         $methods = $svc->getRates();
+
+        $this->getLogger()->info("FedEx Rates Count: " . count($methods));
 
         $rates = [];
         if ($methods) {
