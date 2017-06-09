@@ -110,21 +110,7 @@ class RatesV10 extends Rate
             return;
         }
 
-        $cartItems = $rateRequest->getCartItems();
-        $weight = 0;
-        if ($cartItems) {
-            foreach($cartItems as $cartItem) {
-                $weight += (float) $cartItem->getWeight();
-            }
-        }
-
-        if ($weight < 0.01) {
-            $weight = '0.2';
-        }
-
-        $svc = $this->getShippingService()
-            ->setWeight($weight)
-            ->setCartItems($cartItems);
+        $svc = $this->getShippingService()->setCartItems($rateRequest->getCartItems());
 
         $destination = new ArrayWrapper([
             'street' => '',
@@ -164,6 +150,14 @@ class RatesV10 extends Rate
             foreach($rates as $rate) {
                 $event->addRate($rate);
             }
+        } else {
+            $skus = [];
+            if ($rateRequest->getCartItems()) {
+                foreach($rateRequest->getCartItems() as $item) {
+                    $skus[] = $item->getSku();
+                }
+            }
+            $this->getLogger()->alert("FedEx Error : No Shipping methods for SKUs: " . implode(',', $skus));
         }
 
         $event->setReturnData($returnData);

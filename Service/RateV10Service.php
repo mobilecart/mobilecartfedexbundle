@@ -370,33 +370,53 @@ class RateV10Service
 
         if ($this->getCartItems()) {
 
+            $totalWeight = 0;
+
             foreach($this->getCartItems() as $cartItem) {
-                if ($cartItem->getHeight() > 0
-                    && $cartItem->getWidth() > 0
-                    && $cartItem->getLength() > 0
-                    && $cartItem->getWeight() > 0
-                ) {
 
-                    // Weight
-                    $weight = new Weight();
-                    $weightUnits = new WeightUnits($this->getWeightUnit());
-                    $weight->setUnits($weightUnits);
-                    $weight->setValue($cartItem->getWeight());
-
-                    $package = new RequestedPackageLineItem();
-                    $dimensions = new Dimensions();
-                    $dimensions->setUnits(new LinearUnits($this->getMeasureUnit()))
-                        ->setHeight($cartItem->getHeight())
-                        ->setWidth($cartItem->getWidth())
-                        ->setLength($cartItem->getLength());
-
-                    $package->setWeight($weight)
-                        ->setDimensions($dimensions)
-                        ->setGroupPackageCount(1);
-
-                    $packages[] = $package;
+                $weightVal = (float) $cartItem->getWeight();
+                if ($weightVal < 0.01) {
+                    $weightVal = 0.2;
                 }
+
+                $weightQty = $cartItem->getQty() * $weightVal;
+                $totalWeight += $weightQty;
+
+                $height = (float) $cartItem->getHeight();
+                if ($height < 0.1) {
+                    $height = 4;
+                }
+                $width = (float) $cartItem->getWidth();
+                if ($width < 0.1) {
+                    $width = 4;
+                }
+
+                $length = (float) $cartItem->getLength();
+                if ($length < 0.1) {
+                    $length = 4;
+                }
+
+                // Weight
+                $weight = new Weight();
+                $weightUnits = new WeightUnits($this->getWeightUnit());
+                $weight->setUnits($weightUnits);
+                $weight->setValue($weightQty);
+
+                $package = new RequestedPackageLineItem();
+                $dimensions = new Dimensions();
+                $dimensions->setUnits(new LinearUnits($this->getMeasureUnit()))
+                    ->setHeight($height)
+                    ->setWidth($width)
+                    ->setLength($length);
+
+                $package->setWeight($weight)
+                    ->setDimensions($dimensions)
+                    ->setGroupPackageCount(1);
+
+                $packages[] = $package;
             }
+
+            $this->setWeight($totalWeight);
         }
 
         if (!$packages) {
