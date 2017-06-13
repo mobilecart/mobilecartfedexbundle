@@ -466,20 +466,7 @@ class RateV10Service
 
         $wsdl = realpath(__DIR__ . '/../Api/RateV10/fedex_v10.wsdl');
         $svc = new SoapService($clientClass, $wsdl, $options);
-
-        $success = false;
-        for ($x = 0; $x <= 3; $x++) {
-            try {
-                $this->setResponse($svc->getRates($this->getRequest()));
-                $success = true;
-            } catch(\Exception $e) {
-                $this->getLogger()->error("FedEx Error :" . $e->getMessage());
-            }
-
-            if ($success) {
-                break;
-            }
-        }
+        $this->setResponse($svc->getRates($this->getRequest()));
 
         return $this;
     }
@@ -514,11 +501,14 @@ class RateV10Service
         /** @var \MobileCart\FedexBundle\Api\RateV10\ComplexType\RateReply $response */
         $response = $this->getResponse();
         if (is_object($response)
-            && $response->getHighestSeverity() == 'SUCCESS'
+            && in_array($response->getHighestSeverity(), ['SUCCESS', 'NOTE', 'WARNING'])
             && $response->getRateReplyDetails()
         ) {
 
-            $this->getLogger()->info("FedEx Response Success");
+            $this->getLogger()->info("FedEx Response Success Level : {$response->getHighestSeverity()}");
+            if ($response->getHighestSeverity() == 'WARNING') {
+                $this->getLogger()->alert("FedEx Warning in Response : " . print_r($response, 1));
+            }
 
             // parse out rates into ArrayWrapper objects
             foreach($response->getRateReplyDetails() as $rate) {
