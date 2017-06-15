@@ -380,27 +380,33 @@ class RateV10Service
                 }
 
                 $weightQty = $cartItem->getQty() * $weightVal;
+                $weightQty = (float) number_format($weightQty, 1, '.', '');
+
                 $totalWeight += $weightQty;
 
                 $height = (float) $cartItem->getHeight();
                 if ($height < 0.1) {
-                    $height = 4;
+                    $height = (float) 4.0;
                 }
+                $height = (float) number_format($height, 1, '.', '');
+
                 $width = (float) $cartItem->getWidth();
                 if ($width < 0.1) {
-                    $width = 4;
+                    $width = (float) 4.0;
                 }
+                $width = (float) number_format($width, 1, '.', '');
 
                 $length = (float) $cartItem->getLength();
                 if ($length < 0.1) {
-                    $length = 4;
+                    $length = (float) 4.0;
                 }
+                $length = (float) number_format($length, 1, '.', '');
 
                 // Weight
-                $weight = new Weight();
+                $weightObj = new Weight();
                 $weightUnits = new WeightUnits($this->getWeightUnit());
-                $weight->setUnits($weightUnits);
-                $weight->setValue($weightQty);
+                $weightObj->setUnits($weightUnits);
+                $weightObj->setValue($weightQty);
 
                 $package = new RequestedPackageLineItem();
                 $dimensions = new Dimensions();
@@ -409,7 +415,7 @@ class RateV10Service
                     ->setWidth($width)
                     ->setLength($length);
 
-                $package->setWeight($weight)
+                $package->setWeight($weightObj)
                     ->setDimensions($dimensions)
                     ->setGroupPackageCount(1);
 
@@ -422,19 +428,19 @@ class RateV10Service
         if (!$packages) {
 
             // Weight
-            $weight = new Weight();
+            $weightObj = new Weight();
             $weightUnits = new WeightUnits($this->getWeightUnit());
-            $weight->setUnits($weightUnits);
-            $weight->setValue($this->getWeight());
+            $weightObj->setUnits($weightUnits);
+            $weightObj->setValue(0.5);
 
             $package = new RequestedPackageLineItem();
             $dimensions = new Dimensions();
             $dimensions->setUnits(new LinearUnits($this->getMeasureUnit()))
-                ->setHeight(6)
-                ->setWidth(6)
-                ->setLength(6);
+                ->setHeight(6.0)
+                ->setWidth(6.0)
+                ->setLength(6.0);
 
-            $package->setWeight($weight)
+            $package->setWeight($weightObj)
                 ->setDimensions($dimensions)
                 ->setGroupPackageCount(1);
 
@@ -444,11 +450,11 @@ class RateV10Service
         $shipment->setRequestedPackageLineItems($packages);
 
         // Weight
-        $totalWeight = new Weight();
-        $totalWeight->setUnits(new WeightUnits($this->getWeightUnit()));
-        $totalWeight->setValue($this->getWeight());
+        $totalWeightObj = new Weight();
+        $totalWeightObj->setUnits(new WeightUnits($this->getWeightUnit()));
+        $totalWeightObj->setValue($this->getWeight());
 
-        $shipment->setTotalWeight($totalWeight);
+        $shipment->setTotalWeight($totalWeightObj);
 
         $request->setRequestedShipment($shipment);
         $this->setRequest($request);
@@ -466,7 +472,20 @@ class RateV10Service
 
         $wsdl = realpath(__DIR__ . '/../Api/RateV10/fedex_v10.wsdl');
         $svc = new SoapService($clientClass, $wsdl, $options);
-        $this->setResponse($svc->getRates($this->getRequest()));
+
+        $success = false;
+        for ($x = 1; $x <= 3; $x++) {
+            try {
+                $this->setResponse($svc->getRates($this->getRequest()));
+                $success = true;
+            } catch(\Exception $e) {
+                $this->getLogger()->error("FedEx Error : try ({$x}) : " . $e->getMessage());
+            }
+
+            if ($success) {
+                break;
+            }
+        }
 
         return $this;
     }
@@ -519,7 +538,7 @@ class RateV10Service
                 if ($this->getMethods()
                     && !in_array($serviceType, $this->getMethods())
                 ) {
-                    $this->getLogger()->info("FedEx Response . Skipping method: {$serviceType}");
+                    $this->getLogger()->info("FedEx Response Handler : Skipping method: {$serviceType}");
                     continue;
                 }
 
@@ -567,7 +586,15 @@ class RateV10Service
                 ]);
             }
         } else {
-            $this->getLogger()->alert("FedEx Error . No rates . " . print_r($response, 1));
+
+            $skus = [];
+            if ($this->getCartItems()) {
+                foreach($this->getCartItems() as $item) {
+                    $skus[] = $item->getSku();
+                }
+            }
+
+            $this->getLogger()->alert("FedEx Error . No rates for SKUs : " . implode(',', $skus) . " , Response: " . print_r($response, 1));
         }
 
         return $this->rates;
