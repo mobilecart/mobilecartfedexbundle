@@ -13,15 +13,14 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class RatesV10 extends Rate
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     protected $entityService;
 
     protected $shippingService;
 
+    /**
+     * @var Event
+     */
     protected $event;
 
     /**
@@ -29,22 +28,22 @@ class RatesV10 extends Rate
      */
     protected $logger;
 
-    protected function setEvent($event)
+    /**
+     * @param Event $event
+     * @return $this
+     */
+    protected function setEvent(Event $event)
     {
         $this->event = $event;
         return $this;
     }
 
+    /**
+     * @return Event
+     */
     protected function getEvent()
     {
         return $this->event;
-    }
-
-    protected function getReturnData()
-    {
-        return $this->getEvent()->getReturnData()
-            ? $this->getEvent()->getReturnData()
-            : [];
     }
 
     /**
@@ -102,11 +101,12 @@ class RatesV10 extends Rate
     public function onShippingRateCollect(Event $event)
     {
         $this->setEvent($event);
-        $returnData = $this->getReturnData();
+        $returnData = $event->getReturnData();
 
         $rateRequest = $event->getRateRequest();
 
-        if (!$rateRequest->getPostcode()) {
+        if (!strlen($rateRequest->getPostcode())) {
+            $this->getLogger()->info("FedEx : no postcode. skipping");
             return;
         }
 
