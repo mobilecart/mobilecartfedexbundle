@@ -375,8 +375,8 @@ class RateV10Service
             foreach($this->getCartItems() as $cartItem) {
 
                 $weightVal = (float) $cartItem->getWeight();
-                if ($weightVal < 0.01) {
-                    $weightVal = 0.2;
+                if ($weightVal < 0.1) {
+                    $weightVal = 0.1;
                 }
 
                 $weightQty = $cartItem->getQty() * $weightVal;
