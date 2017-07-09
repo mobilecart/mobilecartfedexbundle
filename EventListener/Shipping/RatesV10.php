@@ -105,6 +105,22 @@ class RatesV10 extends Rate
 
         $rateRequest = $event->getRateRequest();
 
+        if (!$rateRequest->getCartItems()) {
+
+            $amount = $rateRequest->getAddtlPrice();
+
+            $rate = new ArrayWrapper([
+                'id' => 'FedEx',
+                'price' => $amount,
+                'company' => 'FedEx',
+                'method' => '',
+                'code' => "FedEx",
+            ]);
+
+            $event->addRate($rate);
+            return;
+        }
+
         if (!strlen($rateRequest->getPostcode())) {
             $this->getLogger()->info("FedEx : no postcode. skipping");
             return;
@@ -144,7 +160,11 @@ class RatesV10 extends Rate
             foreach($methods as $method) {
                 $rate = new Rate();
                 $rate->addData($method->getData());
-                $rates[$rate->getPrice()] = $rate;
+                $price = $rate->getPrice();
+                if ($rateRequest->getAddtlPrice() > 0.0) {
+                    $price += $rateRequest->getAddtlPrice();
+                }
+                $rates[$price] = $rate;
             }
             ksort($rates);
             foreach($rates as $rate) {
