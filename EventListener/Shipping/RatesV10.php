@@ -109,7 +109,7 @@ class RatesV10 extends Rate
 
             $amount = $rateRequest->getAddtlPrice();
 
-            $rate = new ArrayWrapper([
+            $rate = new Rate([
                 'id' => 'FedEx',
                 'price' => $amount,
                 'company' => 'FedEx',
